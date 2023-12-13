@@ -49,7 +49,7 @@ function chooseTalents() {
 }
 
 
-
+// 选择天赋函数
 function selectTalent(selectedTalent) {
     output.innerHTML += `<br>你选择了天赋：${selectedTalent}。<br>`;
     saveDataToBackend('save_talents.php', { talents: selectedTalent });
@@ -57,7 +57,7 @@ function selectTalent(selectedTalent) {
     allocateAttributePoints(selectedTalent);
 }
 
-
+//分配属性函数
 function allocateAttributePoints(selectedTalent) {
     const output = document.getElementById('output');
     output.innerHTML += `<br>分配属性点：<span id="remainingPoints">可分配属性点：${attributePoints}</span><br>`;
@@ -102,7 +102,7 @@ function updateRemainingPoints() {
 
 
 
-
+//传送属性数据到后端
 function confirmAttributes() {
     const attributesList = Object.keys(attributes);
     const selectedAttributes = {};
@@ -124,43 +124,80 @@ function confirmAttributes() {
 }
 
 
-
-
 function startRebirth() {
     const output = document.getElementById('output');
 
     output.innerHTML += '<br>正式开始重生：<br>';
-
-    const events = [
-        '你参加了一场盛大的派对，结交了一些新朋友。',
-        '你因为聪明的头脑在工作中获得了晋升。',
-        '你因为良好的健康状况能够参加一场激动人心的体育比赛。',
-        '你得知自己患上了一种严重的疾病，需要进行治疗。',
-        '你在一次事故中受伤，康复期较长。',
-        '你因为经营有方成功创业，成为了一名成功的企业家。',
-        '你与爱人结婚，并迎来了可爱的孩子。',
-        '你在一场意外中不幸身亡。',
-    ];
 
     let age = 0;
 
     function simulateYear() {
         age++;
 
-        const randomIndex = Math.floor(Math.random() * events.length);
-        const eventDescription = events[randomIndex];
-        output.innerHTML += `(${age}岁) ${eventDescription}<br>`;
+        // 发起 Ajax 请求获取对应年龄段的事件
+        fetch('get_events.php?age=' + age)
+            .then(response => response.json())
+            .then(data => {
+                const eventDescription = data.events;
+                output.innerHTML += `(${age}岁) ${eventDescription}<br>`;
 
-        if (eventDescription.includes('死') || eventDescription.includes('去世') || eventDescription.includes('亡')) {
-            output.innerHTML += '<br>游戏结束。';
-            saveDataToBackend('save_age.php', { age: age });
-        }
-		else {
-            // 继续模拟下一年
-            setTimeout(simulateYear, 100);
-        }
-
+                if (eventDescription !== undefined && typeof eventDescription === 'string' && (eventDescription.includes('死') || eventDescription.includes('去世') || eventDescription.includes('亡'))) {
+                    output.innerHTML += '<br>游戏结束。';
+                    saveDataToBackend('save_age.php', { age: age });
+                } else {
+                    // 继续模拟下一年
+                    setTimeout(simulateYear, 100);
+                }
+            })
+            .catch(error => {
+                console.error('发生错误:', error);
+                output.innerHTML += `<br>发生错误: ${error.message}<br>`;
+            });
     }
-    // 初始调用
+
+// 初始调用
     setTimeout(simulateYear, 100);
+
+
 }
+
+
+//
+// function startRebirth() {
+//     const output = document.getElementById('output');
+//
+//     output.innerHTML += '<br>正式开始重生：<br>';
+//
+//     const events = [
+//         '你参加了一场盛大的派对，结交了一些新朋友。',
+//         '你因为聪明的头脑在工作中获得了晋升。',
+//         '你因为良好的健康状况能够参加一场激动人心的体育比赛。',
+//         '你得知自己患上了一种严重的疾病，需要进行治疗。',
+//         '你在一次事故中受伤，康复期较长。',
+//         '你因为经营有方成功创业，成为了一名成功的企业家。',
+//         '你与爱人结婚，并迎来了可爱的孩子。',
+//         '你在一场意外中不幸身亡。',
+//     ];
+//
+//     let age = 0;
+//
+//     function simulateYear() {
+//         age++;
+//
+//         const randomIndex = Math.floor(Math.random() * events.length);
+//         const eventDescription = events[randomIndex];
+//         output.innerHTML += `(${age}岁) ${eventDescription}<br>`;
+//
+//         if (eventDescription.includes('死') || eventDescription.includes('去世') || eventDescription.includes('亡')) {
+//             output.innerHTML += '<br>游戏结束。';
+//             saveDataToBackend('save_age.php', { age: age });
+//         }
+// 		else {
+//             // 继续模拟下一年
+//             setTimeout(simulateYear, 100);
+//         }
+//
+//     }
+//     // 初始调用
+//     setTimeout(simulateYear, 100);
+// }

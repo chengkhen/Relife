@@ -22,7 +22,7 @@ VALUES ('" . $data['Looks'] . "', '" . $data['Intelligence'] . "', '" . $data['P
 if ($conn->query($sql) === TRUE) {
     // 返回成功信息
     header('Content-Type: application/json');
-    echo json_encode(['message' => 'Record inserted successfully']);
+    echo json_encode(['message' => '属性保存成功']);
 } else {
     // 返回错误信息
     header('Content-Type: application/json');
