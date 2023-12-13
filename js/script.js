@@ -126,7 +126,7 @@ function confirmAttributes() {
 
 function startRebirth() {
     const output = document.getElementById('output');
-
+    const selectedEvents = [];
     output.innerHTML += '<br>正式开始重生：<br>';
 
     let age = 0;
@@ -144,9 +144,18 @@ function startRebirth() {
                 if (eventDescription !== undefined && typeof eventDescription === 'string' && (eventDescription.includes('死') || eventDescription.includes('去世') || eventDescription.includes('亡'))) {
                     output.innerHTML += '<br>游戏结束。';
                     saveDataToBackend('save_age.php', { age: age });
+                    // 游戏结束时清空已选事件列表
+                    selectedEvents.length = 0;
                 } else {
-                    // 继续模拟下一年
-                    setTimeout(simulateYear, 100);
+                    // 检查是否已经选取过这个事件
+                    if (selectedEvents.includes(eventDescription)) {
+                        // 如果没有选取过，添加到已选事件列表，并显示
+                        selectedEvents.push(eventDescription);
+                        output.innerHTML += `(${age}岁) ${eventDescription}<br>`;
+                    } else {
+                        // 如果已经选取过，重新模拟下一年
+                        setTimeout(simulateYear, 100);
+                    }
                 }
             })
             .catch(error => {
@@ -161,43 +170,3 @@ function startRebirth() {
 
 }
 
-
-//
-// function startRebirth() {
-//     const output = document.getElementById('output');
-//
-//     output.innerHTML += '<br>正式开始重生：<br>';
-//
-//     const events = [
-//         '你参加了一场盛大的派对，结交了一些新朋友。',
-//         '你因为聪明的头脑在工作中获得了晋升。',
-//         '你因为良好的健康状况能够参加一场激动人心的体育比赛。',
-//         '你得知自己患上了一种严重的疾病，需要进行治疗。',
-//         '你在一次事故中受伤，康复期较长。',
-//         '你因为经营有方成功创业，成为了一名成功的企业家。',
-//         '你与爱人结婚，并迎来了可爱的孩子。',
-//         '你在一场意外中不幸身亡。',
-//     ];
-//
-//     let age = 0;
-//
-//     function simulateYear() {
-//         age++;
-//
-//         const randomIndex = Math.floor(Math.random() * events.length);
-//         const eventDescription = events[randomIndex];
-//         output.innerHTML += `(${age}岁) ${eventDescription}<br>`;
-//
-//         if (eventDescription.includes('死') || eventDescription.includes('去世') || eventDescription.includes('亡')) {
-//             output.innerHTML += '<br>游戏结束。';
-//             saveDataToBackend('save_age.php', { age: age });
-//         }
-// 		else {
-//             // 继续模拟下一年
-//             setTimeout(simulateYear, 100);
-//         }
-//
-//     }
-//     // 初始调用
-//     setTimeout(simulateYear, 100);
-// }
